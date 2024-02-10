@@ -27,7 +27,7 @@ const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-cube.position.set(0, 3, -5);
+cube.position.set(0, 2, -5);
 
 async function initXR() {
   // WebXR
@@ -51,22 +51,16 @@ async function initXR() {
   }
 }
 
-console.log("hi");
+renderer.setAnimationLoop(function () {
+  // Rotate the cube
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
 
-// Animation loop
-function animate() {
-  renderer.setAnimationLoop(function () {
-    // Rotate the cube
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
-
-    // Render the scene
-    renderer.render(scene, camera);
-  });
-}
+  // Render the scene
+  renderer.render(scene, camera);
+});
 
 // Start the animation loop
-animate();
 initXR().catch(function (err) {
   console.error(err);
 });
