@@ -5,6 +5,7 @@ const vrButton = document.getElementById("enter-vr");
 
 // Create a scene
 const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
 
 // Create a camera
 const camera = new THREE.PerspectiveCamera(
@@ -23,22 +24,34 @@ document.body.appendChild(renderer.domElement);
 
 // Create a cube
 const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshStandardMaterial({ color: 0x0033aa });
+const material = new THREE.MeshStandardMaterial({
+  color: 0x9b111e,
+  roughness: 0.1,
+  metalness: 0.7,
+});
 const cube = new THREE.Mesh(geometry, material);
 cube.position.set(0, 2, -5);
 scene.add(cube);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const floorGeometry = new THREE.PlaneGeometry(100, 100);
+const floorMaterial = new THREE.MeshStandardMaterial({
+  color: 0x156c0c,
+  roughness: 0.7,
+  metalness: 0.1,
+});
+const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+floor.rotation.x = -Math.PI / 2; // Make it horizontal
+floor.receiveShadow = true; // Allow it to receive shadows
+floor.position.y = 0;
+scene.add(floor);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
 scene.add(ambientLight);
 
-const spotLight = new THREE.SpotLight(0xffffff, 1); // color, intensity
-spotLight.position.set(5, 5, -2); // position the light
-spotLight.angle = Math.PI / 6; // spread angle
-spotLight.penumbra = 0.1; // fade out at the edges
-spotLight.decay = 0.5; // how the light intensity decays over distance
-spotLight.distance = 100; // maximum range of the light
-spotLight.target = cube; // target to point the light at
-scene.add(spotLight);
+const directionalLight = new THREE.DirectionalLight(0xfdfbd3, 1);
+directionalLight.position.set(50, 100, 100);
+directionalLight.castShadow = true;
+scene.add(directionalLight);
 
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -52,6 +65,7 @@ async function initXR() {
       vrButton.addEventListener("click", async () => {
         const session = await navigator.xr.requestSession("immersive-vr", {
           requiredFeatures: ["local-floor"],
+          //optionalFeatures: ["hand-tracking"],
         });
         renderer.xr.setSession(session);
       });
