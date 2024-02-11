@@ -23,11 +23,27 @@ document.body.appendChild(renderer.domElement);
 
 // Create a cube
 const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const material = new THREE.MeshStandardMaterial({ color: 0x0033aa });
 const cube = new THREE.Mesh(geometry, material);
+cube.position.set(0, 2, -5);
 scene.add(cube);
 
-cube.position.set(0, 2, -5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+
+const spotLight = new THREE.SpotLight(0xffffff, 1); // color, intensity
+spotLight.position.set(5, 5, -2); // position the light
+spotLight.angle = Math.PI / 6; // spread angle
+spotLight.penumbra = 0.1; // fade out at the edges
+spotLight.decay = 0.5; // how the light intensity decays over distance
+spotLight.distance = 100; // maximum range of the light
+spotLight.target = cube; // target to point the light at
+scene.add(spotLight);
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+cube.castShadow = true;
+cube.receiveShadow = true;
 
 async function initXR() {
   // WebXR
@@ -36,9 +52,7 @@ async function initXR() {
       vrButton.addEventListener("click", async () => {
         const session = await navigator.xr.requestSession("immersive-vr", {
           requiredFeatures: ["local-floor"],
-          optionalFeatures: ["bounded-floor"],
         });
-        console.log(session);
         renderer.xr.setSession(session);
       });
     } else {
